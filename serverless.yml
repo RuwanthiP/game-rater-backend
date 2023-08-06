@@ -1,0 +1,135 @@
+service: game-rater
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  environment:
+    stage: ${env:STAGE}
+    baseUrl: ${env:BASE_URL}
+  stage: ${opt:stage, 'dev'}
+  region: ap-south-1
+  apiGateway:
+    apiKeys:
+      - ${opt:stage}-api-key
+
+useDotenv: true
+
+custom:
+  defaultCors:
+    origin: "*"
+    headers:
+      - Content-Type
+      - X-Amz-Date
+      - Authorization
+      - X-Api-Key
+      - X-Amz-Security-Token
+      - X-Amz-User-Agent
+
+plugins:
+  - serverless-bundle
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+functions:
+  lambdaAuthorizer:
+    handler: functions/handlers/lambdaAuthorizer.handler
+  hello:
+    handler: functions/handlers/hello.handler
+    events:
+      - http:
+          path: hello
+          method: get
+          private: true
+          cors: ${self:custom.defaultCors}
+  addNewGames:
+    handler: functions/handlers/gameHandler.createGameHandler
+    events:
+      - http:
+          path: games
+          method: post
+          private: true
+          authorizer:
+            name: lambdaAuthorizer
+            resultTtlInSeconds: 0
+          cors: ${self:custom.defaultCors}
+  getAllGames:
+    handler: functions/handlers/gameHandler.getAllGamesHandler
+    events:
+      - http:
+          path: games
+          method: get
+          private: true
+          authorizer:
+            name: lambdaAuthorizer
+            resultTtlInSeconds: 0
+          cors: ${self:custom.defaultCors}
+  getGameById:
+    handler: functions/handlers/gameHandler.getGameByIdHandler
+    events:
+      - http:
+          path: games/{gameId}
+          method: get
+          private: true
+          authorizer:
+            name: lambdaAuthorizer
+          cors: ${self:custom.defaultCors}
+  deleteGameById:
+    handler: functions/handlers/gameHandler.deleteGameByIdHandler
+    events:
+      - http:
+          path: games/{gameId}
+          method: delete
+          private: true
+          authorizer:
+            name: lambdaAuthorizer
+            resultTtlInSeconds: 0
+          cors: ${self:custom.defaultCors}
+  createReview:
+    handler: functions/handlers/reviewHandler.createReviewHandler
+    events:
+      - http:
+          path: games/{gameId}/reviews
+          method: post
+          private: true
+          authorizer:
+            name: lambdaAuthorizer
+          cors: ${self:custom.defaultCors}
+  getAllReviews:
+    handler: functions/handlers/reviewHandler.getAllReviewsHandler
+    events:
+      - http:
+          path: games/{gameId}/reviews
+          method: get
+          private: true
+          authorizer:
+            name: lambdaAuthorizer
+            resultTtlInSeconds: 0
+          cors: ${self:custom.defaultCors}
+  deleteReview:
+    handler: functions/handlers/reviewHandler.deleteReviewHandler
+    events:
+      - http:
+          path: games/{gameId}/reviews/{reviewId}
+          method: delete
+          private: true
+          authorizer:
+            name: lambdaAuthorizer
+            resultTtlInSeconds: 0
+          cors: ${self:custom.defaultCors}
+  login:
+    handler: functions/handlers/authHandler.loginHandler
+    events:
+      - http:
+          path: login
+          method: post
+          private: true
+          cors: ${self:custom.defaultCors}
+  signup:
+    handler: functions/handlers/authHandler.signupHandler
+    events:
+      - http:
+          path: signup
+          method: post
+          private: true
+          cors: ${self:custom.defaultCors}

@@ -1,0 +1,29 @@
+{
+  "name": "game-rater",
+  "version": "1.0.0",
+  "description": "Game-Rater application backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "local": "serverless offline start --stage local --reloadHandler",
+    "deploy": "serverless deploy --stage dev --aws-profile personal-work-profile --verbose"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.299.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
+    "jwt-decode": "^3.1.2",
+    "mongoose": "^7.0.3",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-plugin-import": "^2.27.5",
+    "serverless-bundle": "^6.0.0",
+    "serverless-dotenv-plugin": "^6.0.0",
+    "serverless-offline": "^12.0.4"
+  }
+}
